@@ -89,7 +89,7 @@ module:hook("message/full", function(event)
         module:log('info', 'stanza: '..tostring(stanza));
         if (stanza.name == "message" and tostring(stanza.attr.type) == "chat"  ) then
 					if (stanza:get_child("body")) ~=  nil then
-						module:log('info', 'Private Msg: ' .. stanza:get_child("body"):get_text().. stanza.attr.from);
+						module:log('info', 'Private Msg: ' .. stanza:get_child("body"):get_text().. ' From: ' .. event.origin.jitsi_meet_context_user.name .. ' To: ' .. event.stanza.attr.to);
 					end
 		end
 end);
