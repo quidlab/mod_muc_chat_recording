@@ -5,10 +5,16 @@ module:log('info', 'Loaded chat history plugin');
 local historystore = module:open_store('chat-history', 'map');
 -- Folder in which history will be stored
 local chatHistoryDir = module:get_option('chatHistoryDir', '/var/log/prosody/chat/');
-chatHistoryDir = chatHistoryDir .. (chatHistoryDir:sub(-1)=='/'? : '' : '/') -- ensure that chatHistoryDir ends with a /
+-- chatHistoryDir = chatHistoryDir .. (chatHistoryDir:sub(-1)=='/'? : '' : '/') -- ensure that chatHistoryDir ends with a /
 
 -- Time format used to generate file names and infos
 local timeFormat = "%Y-%m-%d %H-%M-%S"; 
+
+local function getFileName(jid) 
+	local filePath = historystore:get(jid, 'filePath') or 'undef';
+	local fileName = filePath .. '/' .. historystore:get(jid, 'createdAt') .. '.log';
+	return fileName, filePath;
+end
 
 -- Print history to file
 -- Warning: only works on linux, since I'm using os.execute mkdir and echo
@@ -27,11 +33,7 @@ local function printHistory(msg, jid)
 	end
 end
 
-local function getFileName(jid) 
-	local filePath = historystore:get(jid, 'filePath') or 'undef';
-	local fileName = filePath .. '/' .. historystore:get(jid, 'createdAt') .. '.log';
-	return fileName, filePath;
-end
+
 
 -- Extracts the message from a stanza
 local function extractMessage(stanza)
