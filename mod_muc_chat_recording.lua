@@ -40,10 +40,11 @@ local function extractMessage(stanza)
 	local userName =  tostring(stanza[2][1]);
 	local userId = stanza.attr.from;
 	local message = tostring(stanza[1][1]);
-	local timestamp = os.time();
+	local timestamp = os.date(timeFormat);
 	local room = stanza.attr.to
 
-	return (userId..'- ['..timestamp..']'..' '..userName..': '..message);
+	-- return (userId..'- ['..timestamp..']'..' '..userName..': '..message);
+	return ('['..timestamp..']'..' '..userName..': '..message);
 end
 
 -- Hook to room created, which will create the chat history file
@@ -80,3 +81,16 @@ module:hook("message/bare", function(event)
 		printHistory(extractMessage(stanza), stanza.attr.to);
 	end
 end);
+
+-- record Private , work in progress
+
+module:hook("message/full", function(event)
+        local stanza = event.stanza;
+        module:log('info', 'stanza: '..tostring(stanza));
+        if (stanza.name == "message" and tostring(stanza.attr.type) == "chat"  ) then
+					if (stanza:get_child("body")) ~=  nil then
+						module:log('info', 'Private Msg: ' .. stanza:get_child("body"):get_text().. stanza.attr.from);
+					end
+		end
+end);
+
